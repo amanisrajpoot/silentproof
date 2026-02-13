@@ -38,6 +38,7 @@ export default function SitemapPage() {
                 { title: "Case Studies", href: "/cases", icon: FileText },
                 { title: "Pricing & Plans", href: "/pricing", icon: FileText },
                 { title: "Contact Securely", href: "/contact", icon: FileText },
+                { title: "Ground Network", href: "/silent-network", icon: Lock },
             ]
         }
     ];

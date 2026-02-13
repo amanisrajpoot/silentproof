@@ -48,6 +48,7 @@ export const Footer = () => {
                             <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact Securely</Link></li>
                             <li><Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary font-semibold text-primary">Privacy Policy</Link></li>
                             <li><Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">Terms & Conditions</Link></li>
+                            <li><Link href="/silent-network" className="text-[10px] uppercase font-bold text-muted-foreground/30 hover:text-primary transition-all tracking-[0.2em] pt-2 block">Partner Network</Link></li>
                         </ul>
                     </div>
 
