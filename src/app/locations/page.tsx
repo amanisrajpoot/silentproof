@@ -1,27 +1,12 @@
 import Link from "next/link";
 import { MapPin, Phone, Building2, Shield, ArrowRight, MessageSquare } from "lucide-react";
 
-export default function LocationsIndexPage() {
-    const locations = [
-        {
-            slug: "delhi",
-            city: "Delhi NCR",
-            description: "Our primary hub for Northern India investigations and high-court legal verifications.",
-            phone: "+91 11 4XXX XXXX",
-        },
-        {
-            slug: "lucknow",
-            city: "Lucknow",
-            description: "Leading investigative firm in the capital of Uttar Pradesh, specializing in civil disputes.",
-            phone: "+91 522 4XXX XXXX",
-        },
-        {
-            slug: "bangalore",
-            city: "Bangalore",
-            description: "Technical surveillance and I.P. infringement specialists in the tech capital.",
-            phone: "+91 80 4XXX XXXX",
-        }
-    ];
+import { supabase } from "@/lib/supabase";
+
+export const revalidate = 0;
+
+export default async function LocationsIndexPage() {
+    const { data: locations } = await supabase.from('locations').select('*');
 
     return (
         <div className="flex flex-col min-h-screen bg-background">
@@ -46,7 +31,7 @@ export default function LocationsIndexPage() {
             <section className="py-24 px-4">
                 <div className="container mx-auto max-w-5xl">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {locations.map((loc) => (
+                        {locations?.map((loc: any) => (
                             <div key={loc.slug} className="group flex flex-col justify-between p-8 bg-white border border-border rounded-[2rem] hover:border-primary transition-all">
                                 <div className="space-y-6">
                                     <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center group-hover:bg-primary/10 transition-colors">

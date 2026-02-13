@@ -3,88 +3,18 @@ import { notFound } from "next/navigation";
 import { Shield, CheckCircle2, ArrowRight, Lock, EyeOff, FileText, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const SERVICES_DATA = {
-    "matrimonial": {
-        title: "Matrimonial Investigation",
-        description: "Ensuring clarity and trust before life's biggest commitment. We provide comprehensive background checks for prospective brides and grooms.",
-        features: [
-            "Character & Lifestyle Assessment",
-            "Employment & Financial Verification",
-            "Family Background & Reputation Check",
-            "Social Media & Online Presence Audit",
-            "Previous Marriage/Relationship History"
-        ],
-        process: [
-            "Initial Secure Consultation",
-            "Discreet Field Investigation",
-            "Evidence Collection (Photos/Videos)",
-            "Comprehensive Digital Audit",
-            "Final Confidential Report Delivery"
-        ],
-        cta: "Secure Your Future"
-    },
-    "corporate": {
-        title: "Corporate Fraud & Due Diligence",
-        description: "Protecting your business assets and reputation through professional investigative services and forensic audits.",
-        features: [
-            "Employee Theft & Embezzlement",
-            "Intellectual Property Protection",
-            "Competitor Intelligence",
-            "Supply Chain Verification",
-            "Pre-Employment Screenings"
-        ],
-        process: [
-            "Risk Assessment & Scoping",
-            "Internal Audit & Surveillance",
-            "Data Forensic Analysis",
-            "Interviewing & Statement Taking",
-            "Legal Documentation & Reporting"
-        ],
-        cta: "Protect Your Business"
-    },
-    "background": {
-        title: "Background Verification",
-        description: "Reliable, fast, and comprehensive verification services for high-stakes hiring and sensitive partnerships.",
-        features: [
-            "Criminal Record Checks",
-            "Educational Degree Verification",
-            "Previous Employment Validation",
-            "Address & Identity Proofing",
-            "Reference Interviews"
-        ],
-        process: [
-            "Document Submission",
-            "Database & Digital Search",
-            "Physical Site Verification",
-            "Third-Party Cross-Referencing",
-            "Verified Status Report"
-        ],
-        cta: "Verify Now"
-    },
-    "surveillance": {
-        title: "Professional Surveillance",
-        description: "High-tech, discreet surveillance for personal and legal matters involving complete confidentiality.",
-        features: [
-            "24/7 Physical Monitoring",
-            "GPS Tracking (Matrimonial/Asset)",
-            "Motion-Activated Recording",
-            "Counter-Surveillance Checks",
-            "Infidelity Investigations"
-        ],
-        process: [
-            "Case Mapping & Target Identity",
-            "Field Deployment (Static/Mobile)",
-            "Real-time Updates (Encrypted)",
-            "Timeline & Proof Synthesis",
-            "Case Closing & File Cleanup"
-        ],
-        cta: "Start Surveillance"
-    }
-};
+import { supabase } from "@/lib/supabase";
+
+export const revalidate = 0;
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const service = SERVICES_DATA[slug as keyof typeof SERVICES_DATA];
+
+    const { data: service } = await supabase
+        .from('service_offerings')
+        .select('*')
+        .eq('slug', slug)
+        .single();
 
     if (!service) {
         notFound();
@@ -131,7 +61,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                                 <div className="h-1 w-20 bg-primary/20 rounded-full" />
                             </div>
                             <ul className="space-y-6">
-                                {service.features.map((feature) => (
+                                {service.features?.map((feature: string) => (
                                     <li key={feature} className="flex items-start gap-4 group">
                                         <div className="p-1 bg-primary/5 rounded-full border border-primary/10 group-hover:bg-primary/10 transition-colors mt-1">
                                             <CheckCircle2 className="w-4 h-4 text-primary" />
@@ -154,7 +84,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                             <div className="space-y-8 relative">
                                 {/* Vertical Line */}
                                 <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-primary/10" />
-                                {service.process.map((step, idx) => (
+                                {service.process?.map((step: string, idx: number) => (
                                     <div key={step} className="flex gap-6 relative">
                                         <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shrink-0 z-10 border-4 border-white">
                                             <span className="text-xs font-bold text-primary-foreground">{idx + 1}</span>

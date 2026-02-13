@@ -1,33 +1,33 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Network, MapPin, ClipboardList, Camera, ShieldCheck, Zap, UserPlus } from "lucide-react";
+import { Network, MapPin, ClipboardList, Camera, ShieldCheck, Zap, UserPlus, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function SilentNetworkPage() {
-    const mockTasks = [
-        {
-            id: "SN-901",
-            title: "Address Verification",
-            location: "Gomti Nagar, Lucknow",
-            reward: "₹500",
-            type: "Physical Verify",
-            desc: "Confirm if the resident at 'Sector 4, Plot 12' is active. No contact required."
-        },
-        {
-            id: "SN-902",
-            title: "Entrance Photography",
-            location: "Saket, Delhi",
-            reward: "₹800",
-            type: "Visual Support",
-            desc: "Take 3 clear photos of the main entrance and parking lot of 'Rectangle One'."
-        },
-        {
-            id: "SN-903",
-            title: "Document Drop",
-            location: "Indiranagar, Bangalore",
-            reward: "₹400",
-            type: "Logistics",
-            desc: "Drop a sealed envelope (provided) at the reception of 'Tech Park Alpha'."
+    const [tasks, setTasks] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [activeCity, setActiveCity] = useState("All");
+
+    useEffect(() => {
+        fetchTasks();
+    }, [activeCity]);
+
+    async function fetchTasks() {
+        setLoading(true);
+        let query = supabase.from('tasks').select('*').eq('status', 'open');
+
+        if (activeCity !== "All") {
+            query = query.ilike('location', `%${activeCity}%`);
         }
-    ];
+
+        const { data, error } = await query;
+        if (!error && data) {
+            setTasks(data);
+        }
+        setLoading(false);
+    }
 
     return (
         <div className="flex flex-col min-h-screen bg-[#050505] text-white selection:bg-primary selection:text-white">
@@ -98,41 +98,61 @@ export default function SilentNetworkPage() {
                             <p className="text-white/40 max-w-md italic">"Straightforward field support requirements for verified nodes."</p>
                         </div>
                         <div className="flex gap-2">
-                            {["Lucknow", "Delhi", "Bangalore"].map(city => (
-                                <button key={city} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold transition-all">
+                            {["All", "Lucknow", "Delhi", "Bangalore"].map(city => (
+                                <button
+                                    key={city}
+                                    onClick={() => setActiveCity(city)}
+                                    className={cn(
+                                        "px-4 py-2 border rounded-lg text-xs font-bold transition-all",
+                                        activeCity === city
+                                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                                            : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                                    )}
+                                >
                                     {city}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {mockTasks.map((task) => (
-                            <div key={task.id} className="group p-8 bg-white/[0.03] border border-white/10 rounded-[2rem] hover:border-primary/50 transition-all flex flex-col justify-between">
-                                <div className="space-y-6">
-                                    <div className="flex justify-between items-start">
-                                        <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:bg-blue-500/20 transition-colors text-blue-400">
-                                            {task.type === "Visual Support" ? <Camera className="w-5 h-5" /> : <MapPin className="w-5 h-5" />}
+                    {loading ? (
+                        <div className="py-20 flex flex-col items-center justify-center gap-4 text-white/20">
+                            <Loader2 className="w-8 h-8 animate-spin" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Synchronizing Ledger...</span>
+                        </div>
+                    ) : tasks.length === 0 ? (
+                        <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[3rem]">
+                            <p className="text-white/20 font-mono text-sm uppercase tracking-widest">No active protocols in this sector.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {tasks.map((task) => (
+                                <div key={task.id} className="group p-8 bg-white/[0.03] border border-white/10 rounded-[2rem] hover:border-primary/50 transition-all flex flex-col justify-between">
+                                    <div className="space-y-6">
+                                        <div className="flex justify-between items-start">
+                                            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:bg-blue-500/20 transition-colors text-blue-400">
+                                                {task.type === "Visual Support" ? <Camera className="w-5 h-5" /> : <MapPin className="w-5 h-5" />}
+                                            </div>
+                                            <span className="text-xs font-mono text-white/20">{task.id}</span>
                                         </div>
-                                        <span className="text-xs font-mono text-white/20">{task.id}</span>
+                                        <div className="space-y-2">
+                                            <h3 className="text-xl font-bold text-white">{task.title}</h3>
+                                            <div className="flex items-center gap-2 text-xs font-bold text-blue-400 italic">
+                                                <MapPin className="w-3 h-3" /> {task.location}
+                                            </div>
+                                            <p className="text-sm text-white/50 leading-relaxed pt-2">{task.description}</p>
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <h3 className="text-xl font-bold text-white">{task.title}</h3>
-                                        <div className="flex items-center gap-2 text-xs font-bold text-blue-400 italic">
-                                            <MapPin className="w-3 h-3" /> {task.location}
-                                        </div>
-                                        <p className="text-sm text-white/50 leading-relaxed pt-2">{task.desc}</p>
+                                    <div className="pt-8 mt-8 border-t border-white/5 flex items-center justify-between">
+                                        <span className="text-2xl font-black tracking-tighter text-blue-400">₹{task.reward}</span>
+                                        <Link href="/silent-network/auth" className="p-3 bg-blue-500/10 hover:bg-primary hover:text-white rounded-xl transition-all text-blue-400 hover:text-white border border-blue-500/20">
+                                            <Zap className="w-5 h-5" />
+                                        </Link>
                                     </div>
                                 </div>
-                                <div className="pt-8 mt-8 border-t border-white/5 flex items-center justify-between">
-                                    <span className="text-2xl font-black tracking-tighter text-blue-400">{task.reward}</span>
-                                    <Link href="/silent-network/auth" className="p-3 bg-blue-500/10 hover:bg-primary hover:text-white rounded-xl transition-all text-blue-400 hover:text-white border border-blue-500/20">
-                                        <Zap className="w-5 h-5" />
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -146,4 +166,8 @@ export default function SilentNetworkPage() {
             </footer>
         </div>
     );
+}
+
+function cn(...classes: any[]) {
+    return classes.filter(Boolean).join(" ");
 }

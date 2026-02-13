@@ -1,28 +1,12 @@
 import { Shield, Clock, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function PricingPage() {
-    const plans = [
-        {
-            name: "Standard Discovery",
-            price: "₹15,000",
-            description: "Ideal for initial background checks and single-day field surveillance.",
-            features: ["24-Hour Field Work", "Basic Digital Audit", "Standard Photo Evidence", "Digital Report Delivery"]
-        },
-        {
-            name: "Strategic Investigation",
-            price: "₹45,000+",
-            description: "Comprehensive multi-day investigation for matrimonial or corporate fraud.",
-            features: ["72-Hour Monitoring", "Deep-Web Asset Tracing", "Video Evidence Logs", "Senior Consultant Review", "Local Site Verification"],
-            popular: true
-        },
-        {
-            name: "Corporate Retainer",
-            price: "Custom",
-            description: "Ongoing due diligence and risk assessment for businesses and law firms.",
-            features: ["Dedicated Field Team", "Forensic Data Analysis", "Bi-Weekly Reporting", "Legal Document Prep", "Priority 24/7 Support"]
-        }
-    ];
+import { supabase } from "@/lib/supabase";
+
+export const revalidate = 0;
+
+export default async function PricingPage() {
+    const { data: plans } = await supabase.from('plans').select('*');
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -41,9 +25,9 @@ export default function PricingPage() {
             <section className="py-24 px-4 bg-background">
                 <div className="container mx-auto max-w-6xl">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {plans.map((p) => (
-                            <div key={p.name} className={`relative p-8 md:p-10 rounded-3xl border ${p.popular ? 'border-primary border-2 shadow-2xl ring-4 ring-primary/5' : 'border-border'} flex flex-col justify-between`}>
-                                {p.popular && (
+                        {plans?.map((p: any) => (
+                            <div key={p.name} className={`relative p-8 md:p-10 rounded-3xl border ${p.is_popular ? 'border-primary border-2 shadow-2xl ring-4 ring-primary/5' : 'border-border'} flex flex-col justify-between`}>
+                                {p.is_popular && (
                                     <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                                         Most Requested
                                     </div>
@@ -59,7 +43,7 @@ export default function PricingPage() {
                                     </div>
                                     <div className="h-px bg-border w-full" />
                                     <ul className="space-y-4">
-                                        {p.features.map(f => (
+                                        {p.features?.map((f: string) => (
                                             <li key={f} className="flex items-start gap-3">
                                                 <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-1 shrink-0" />
                                                 <span className="text-sm text-muted-foreground font-medium">{f}</span>
@@ -68,7 +52,7 @@ export default function PricingPage() {
                                     </ul>
                                 </div>
                                 <div className="pt-10">
-                                    <Link href="/contact" className={`w-full py-4 rounded-xl font-bold text-center block transition-all ${p.popular ? 'bg-primary text-primary-foreground hover:shadow-xl' : 'bg-secondary hover:bg-muted'}`}>
+                                    <Link href="/contact" className={`w-full py-4 rounded-xl font-bold text-center block transition-all ${p.is_popular ? 'bg-primary text-primary-foreground hover:shadow-xl' : 'bg-secondary hover:bg-muted'}`}>
                                         Request Free Estimate
                                     </Link>
                                 </div>

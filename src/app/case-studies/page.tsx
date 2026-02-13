@@ -1,30 +1,12 @@
 import { FileText, CheckCircle2, Shield, Lock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export default function CaseStudiesPage() {
-    const cases = [
-        {
-            title: "Extortion Threat Resolution",
-            category: "Corporate",
-            outcome: "Identified the source of a digital extortion campaign targeting a tech firm CEO.",
-            tags: ["Forensics", "Surveillance", "Cyber Trace"],
-            color: "bg-blue-50 text-blue-700"
-        },
-        {
-            title: "Pre-Matrimonial Background Check",
-            category: "Personal",
-            outcome: "Exposed previously undisclosed financial liabilities and multiple legal conflicts.",
-            tags: ["Background Verify", "Reputation Audit"],
-            color: "bg-purple-50 text-purple-700"
-        },
-        {
-            title: "Warehouse Inventory Leakage",
-            category: "Corporate",
-            outcome: "Dismantled an internal theft ring operating within a logistics facility in Mumbai.",
-            tags: ["Undercover", "Internal Audit"],
-            color: "bg-emerald-50 text-emerald-700"
-        }
-    ];
+import { supabase } from "@/lib/supabase";
+
+export const revalidate = 0;
+
+export default async function CaseStudiesPage() {
+    const { data: cases } = await supabase.from('case_studies').select('*');
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -43,10 +25,10 @@ export default function CaseStudiesPage() {
             <section className="py-24 px-4 bg-background">
                 <div className="container mx-auto max-w-5xl">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {cases.map((c) => (
+                        {cases?.map((c: any) => (
                             <div key={c.title} className="group p-8 border border-border rounded-3xl hover:border-primary hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col justify-between">
                                 <div className="space-y-6">
-                                    <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${c.color}`}>
+                                    <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${c.color_theme}`}>
                                         {c.category}
                                     </div>
                                     <h3 className="text-xl font-bold text-primary group-hover:underline underline-offset-4">{c.title}</h3>
@@ -54,7 +36,7 @@ export default function CaseStudiesPage() {
                                         {c.outcome}
                                     </p>
                                     <div className="flex flex-wrap gap-2 pt-2">
-                                        {c.tags.map(tag => (
+                                        {c.tags?.map((tag: string) => (
                                             <span key={tag} className="px-2 py-1 bg-secondary text-[9px] font-bold text-muted-foreground rounded border border-border">{tag}</span>
                                         ))}
                                     </div>

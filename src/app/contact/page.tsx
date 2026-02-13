@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Shield, Send, Lock, EyeOff, CheckCircle2, Loader2, UploadCloud } from "lucide-react";
+import { submitLead } from "./actions";
 
 export default function ContactPage() {
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -47,9 +48,28 @@ export default function ContactPage() {
 
         setStatus("loading");
 
-        // Simulate secure transmission
-        await new Promise(r => setTimeout(r, 2000));
-        setStatus("success");
+        try {
+            // Use Server Action instead of client-side supabase call
+            const result = await submitLead({
+                name: formData.name,
+                contact_method: formData.contact,
+                city: formData.city,
+                service_type: formData.service,
+                message: formData.message,
+            });
+
+            if (result.success) {
+                // Artificial delay for UX consistency
+                await new Promise(r => setTimeout(r, 1500));
+                setStatus("success");
+            } else {
+                console.error('Submission failed:', result.error);
+                setStatus("error");
+            }
+        } catch (err: any) {
+            console.error('Unexpected frontend error:', err);
+            setStatus("error");
+        }
     };
 
     return (
